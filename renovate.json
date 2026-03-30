@@ -1,0 +1,64 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    "customManagers:githubActionsVersions"
+  ],
+  "labels": ["dependencies", "go-dependencies"],
+  "automerge": false,
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "packageRules": [
+    {
+      "description": "Automatically merge minor and patch updates for Go dependencies",
+      "matchUpdateTypes": ["minor", "patch", "digest", "pinDigest"],
+      "matchDatasources": ["go"],
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "schedule": ["before 3am on monday"]
+    },
+    {
+      "description": "Group Go dependency updates",
+      "matchDatasources": ["go"],
+      "groupName": "go-dependencies",
+      "schedule": ["before 3am on monday"]
+    },
+    {
+      "description": "Require human review for major version bumps",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["breaking-change"]
+    },
+    {
+      "description": "Limit Go version updates to patch releases",
+      "matchDatasources": ["golang-version"],
+      "matchUpdateTypes": ["major", "minor"],
+      "enabled": false
+    }
+  ],
+  "go": {
+    "supportPolicy": ["current", "previous"]
+  },
+  "prConcurrentLimit": 3,
+  "prCreationLimit": 2,
+  "schedule": [
+    "before 3am on monday"
+  ],
+  "timezone": "UTC",
+  "rangeStrategy": "bump",
+  "semanticCommits": true,
+  "commitMessagePrefix": "chore(deps):",
+  "vulnerabilityAlerts": {
+    "labels": ["security", "vulnerability"],
+    "automerge": true,
+    "automergeType": "pr",
+    "automergeStrategy": "squash"
+  }
+}

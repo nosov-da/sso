@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags: 
+      - 'v*'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      packages: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.24
+    
+    - name: Build binaries
+      run: |
+        mkdir -p dist
+        
+        # Linux
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dist/sso-linux-amd64 ./cmd/sso
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o dist/sso-linux-arm64 ./cmd/sso
+        
+        # macOS
+        GOOS=darwin GOARCH=amd64 go build -o dist/sso-darwin-amd64 ./cmd/sso
+        GOOS=darwin GOARCH=arm64 go build -o dist/sso-darwin-arm64 ./cmd/sso
+        
+        # Windows
+        GOOS=windows GOARCH=amd64 go build -o dist/sso-windows-amd64.exe ./cmd/sso
+    
+    - name: Calculate checksums
+      run: |
+        cd dist
+        sha256sum * > checksums.txt
+        cat checksums.txt
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
+        draft: false
+        prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

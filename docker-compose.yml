@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sso
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  sso:
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      SSO_ADDR: ':8080'
+      SSO_JWT_SECRET: 'supersecret'
+      SSO_DB_DSN: 'postgres://postgres:postgres@postgres:5432/sso?sslmode=disable'
+    ports:
+      - '8080:8080'
+    volumes:
+      - .:/app
+    command: ['/usr/local/bin/sso']
+
+volumes:
+  postgres_data:

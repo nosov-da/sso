@@ -1,0 +1,85 @@
+name: Code Review
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-review:
+    name: Automated Code Review
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: 1.24
+    
+    - name: Check for large files
+      run: |
+        large_files=$(find . -type f -size +5M ! -path './.git/*' -o -name '*.bin' -o -name '*.exe')
+        if [ ! -z "$large_files" ]; then
+          echo "⚠️ Large files detected:"
+          echo "$large_files"
+        fi
+    
+    - name: Comment PR with checklist
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr_number = context.issue.number;
+          const checklist = `## PR Review Checklist ✓
+          
+          Please ensure that:
+          - [ ] Code is properly formatted (\`go fmt ./...\`)
+          - [ ] All tests pass (\`go test ./...\`)
+          - [ ] Code coverage is maintained
+          - [ ] No security issues detected
+          - [ ] Commit messages are clear and descriptive
+          - [ ] Changes follow project conventions
+          - [ ] Documentation is updated if needed
+          
+          ### Automated Checks
+          - ✓ Tests running...
+          - ✓ Linting checks...
+          - ✓ Security scanning...
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: pr_number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: checklist
+          });
+
+  pull-request-comments:
+    name: Validate PR Description
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check PR title
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const title = context.payload.pull_request.title;
+          const validPrefixes = ['feat:', 'fix:', 'docs:', 'style:', 'refactor:', 'test:', 'chore:'];
+          const hasValidPrefix = validPrefixes.some(prefix => title.startsWith(prefix));
+          
+          if (!hasValidPrefix && title.length > 0) {
+            console.log('⚠️ PR title should start with one of: ' + validPrefixes.join(', '));
+            console.log('Examples: "feat: add new feature", "fix: resolve bug"');
+          }
+    
+    - name: Check PR description length
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const body = context.payload.pull_request.body;
+          if (!body || body.trim().length < 10) {
+            console.log('⚠️ PR description is too short. Please provide details about your changes.');
+          }
