@@ -2,13 +2,13 @@ package middleware
 
 import (
 	"encoding/json"
-	"log/slog"
+	"log"
 	"net/http"
 	"time"
 )
 
 // LoggingMiddleware logs HTTP requests and responses
-func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
+func LoggingMiddleware(logger *log.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
@@ -22,12 +22,8 @@ func LoggingMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 			next.ServeHTTP(wrapped, r)
 
 			duration := time.Since(start)
-			logger.Info("HTTP request",
-				"method", r.Method,
-				"path", r.URL.Path,
-				"status", wrapped.statusCode,
-				"duration_ms", duration.Milliseconds(),
-			)
+			logger.Printf("HTTP request method=%s path=%s status=%d duration_ms=%d",
+				r.Method, r.URL.Path, wrapped.statusCode, duration.Milliseconds())
 		})
 	}
 }
