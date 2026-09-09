@@ -101,7 +101,7 @@ jobs:
     - name: Build binary
       run: |
         mkdir -p bin
-        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/sso ./cmd/sso
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/sso .
     
     - name: Verify binary
       run: ./bin/sso --version 2>/dev/null || echo "Binary built successfully (no --version flag)"
