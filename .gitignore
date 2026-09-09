@@ -1,9 +1,4 @@
-```
-# Environment
-.env
-.env.local
-.env.*
-
+```gitignore
 # Dependencies
 node_modules/
 
@@ -18,43 +13,50 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+env/
 venv/
 .venv/
-.eggs/
-.egg-info/
-*.egg-info/
+.venv.bak/
+pip-log.txt
+pip-selfcheck.json
 
 # Logs
 *.log
+*.out
+*.pid
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # Coverage
 .coverage
 coverage/
 htmlcov/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# OS
-.DS_Store
-Thumbs.db
-
 # Testing
 .pytest_cache/
 .mypy_cache/
-.nyc_output/
-coverage/
+.hypothesis/
 
-# Distribution
-*.tar.gz
-*.whl
-*.egg
-
-# Compression
+# Compressed files
 *.zip
 *.gz
 *.tar
@@ -73,4 +75,8 @@ coverage/
 *.Z
 *.lz
 *.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```

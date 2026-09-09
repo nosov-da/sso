@@ -28,15 +28,15 @@ jobs:
         mkdir -p dist
         
         # Linux
-        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dist/sso-linux-amd64 ./cmd/sso
-        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o dist/sso-linux-arm64 ./cmd/sso
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dist/sso-linux-amd64 .
+        CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o dist/sso-linux-arm64 .
         
         # macOS
-        GOOS=darwin GOARCH=amd64 go build -o dist/sso-darwin-amd64 ./cmd/sso
-        GOOS=darwin GOARCH=arm64 go build -o dist/sso-darwin-arm64 ./cmd/sso
+        GOOS=darwin GOARCH=amd64 go build -o dist/sso-darwin-amd64 .
+        GOOS=darwin GOARCH=arm64 go build -o dist/sso-darwin-arm64 .
         
         # Windows
-        GOOS=windows GOARCH=amd64 go build -o dist/sso-windows-amd64.exe ./cmd/sso
+        GOOS=windows GOARCH=amd64 go build -o dist/sso-windows-amd64.exe .
     
     - name: Calculate checksums
       run: |
