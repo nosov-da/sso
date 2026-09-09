@@ -1,30 +1,30 @@
 package api
 
 import (
-"bytes"
-"encoding/json"
-"log/slog"
-"net/http"
-"net/http/httptest"
-"os"
-appsvc "sso/application/user"
-"sso/infrastructure/events"
-inmemoryrep "sso/infrastructure/persistence"
-"testing"
+	"bytes"
+	"encoding/json"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	appsvc "sso/application/user"
+	"sso/infrastructure/events"
+	inmemoryrep "sso/infrastructure/persistence"
+	"testing"
 )
 
 func createTestHandler() (*AuthHandler, *appsvc.RegisterUserUseCase, *appsvc.AuthenticateUserUseCase) {
-repo := inmemoryrep.NewInMemoryUserRepository()
-publisher := events.NewInMemoryEventPublisher()
+	repo := inmemoryrep.NewInMemoryUserRepository()
+	publisher := events.NewInMemoryEventPublisher()
 
-mockTokenService := &mockTokenService{token: "test-token-123"}
+	mockTokenService := &mockTokenService{token: "test-token-123"}
 
-registerUC := appsvc.NewRegisterUserUseCase(repo, publisher)
-authenticateUC := appsvc.NewAuthenticateUserUseCase(repo, mockTokenService, publisher)
+	registerUC := appsvc.NewRegisterUserUseCase(repo, publisher)
+	authenticateUC := appsvc.NewAuthenticateUserUseCase(repo, mockTokenService, publisher)
 
-logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelError}))
-handler := NewAuthHandlerWithLogger(registerUC, authenticateUC, logger)
-return handler, registerUC, authenticateUC
+	logger := log.New(os.Stdout, "", log.LstdFlags)
+	handler := NewAuthHandlerWithLogger(registerUC, authenticateUC, logger)
+	return handler, registerUC, authenticateUC
 }
 
 func TestAuthHandler_Register_Success(t *testing.T) {

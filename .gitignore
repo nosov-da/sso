@@ -1,46 +1,22 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool
+```
+# Compiled and build artifacts
+*.o
+*.obj
 *.out
-.coverage
 
-# Dependency directories
+# Dependencies
 vendor/
 
-# Go workspace file
-go.work
+# Logs and temp files
+*.log
+*.tmp
 
-# Environment variables
+# Environment
 .env
 .env.local
-.env.*.local
+*.env.*
 
-# IDE
-.idea/
+# Editors
 .vscode/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Build artifacts
-dist/
-build/
-bin/
-sso
-
-# Database
-*.db
-*.sqlite3
-
-# Logs
-*.log
+.idea/
+```

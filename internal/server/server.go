@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"log/slog"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -22,12 +22,12 @@ func Run(cfg *config.Config, authSvc interface{}) error {
 
 // RunWithUseCases starts the server with DDD use cases
 func RunWithUseCases(cfg *config.Config, registerUC *appsvc.RegisterUserUseCase, authenticateUC *appsvc.AuthenticateUserUseCase) error {
-	logger := slog.Default()
+	logger := log.Default()
 	return RunWithUseCasesAndLogger(cfg, registerUC, authenticateUC, logger)
 }
 
 // RunWithUseCasesAndLogger starts the server with DDD use cases and custom logger
-func RunWithUseCasesAndLogger(cfg *config.Config, registerUC *appsvc.RegisterUserUseCase, authenticateUC *appsvc.AuthenticateUserUseCase, logger *slog.Logger) error {
+func RunWithUseCasesAndLogger(cfg *config.Config, registerUC *appsvc.RegisterUserUseCase, authenticateUC *appsvc.AuthenticateUserUseCase, logger *log.Logger) error {
 	h := api.NewAuthHandlerWithLogger(registerUC, authenticateUC, logger)
 
 	mux := http.NewServeMux()
@@ -59,9 +59,9 @@ func RunWithUseCasesAndLogger(cfg *config.Config, registerUC *appsvc.RegisterUse
 
 	// Start server in goroutine
 	go func() {
-		logger.Info("server starting", "addr", cfg.Addr)
+		logger.Printf("server starting addr=%s", cfg.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error("server error", "error", err)
+			logger.Printf("server error: %v", err)
 		}
 	}()
 
@@ -70,17 +70,17 @@ func RunWithUseCasesAndLogger(cfg *config.Config, registerUC *appsvc.RegisterUse
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	logger.Info("shutting down server")
+	logger.Println("shutting down server")
 
 	// Graceful shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		logger.Error("server shutdown error", "error", err)
+		logger.Printf("server shutdown error: %v", err)
 		return err
 	}
 
-	logger.Info("server stopped")
+	logger.Println("server stopped")
 	return nil
 }
